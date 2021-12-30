@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameMaster : MonoBehaviour
 {
+    public static int winCount;
 
     [Header("Settings")]
     public int minGridDiameter;
@@ -36,6 +38,8 @@ public class GameMaster : MonoBehaviour
     public Sprite[] numberSprites;
 
     [Header("References")]
+    public GameObject winScreen;
+    public GameObject lossScreen; 
     public GameObject gridGO;
     public GameObject gridBG;
     public Transform tileParent;
@@ -96,6 +100,8 @@ public class GameMaster : MonoBehaviour
     {
         userInput.SetActive(true);
         gridGO.SetActive(false);
+        winScreen.SetActive(false);
+        lossScreen.SetActive(false);
 
         gameRunning = false;
     }
@@ -230,11 +236,15 @@ public class GameMaster : MonoBehaviour
         {
             //Game won
             Debug.Log("Hey, you won the game!");
+
+            winScreen.SetActive(true);
         }
         else
         {
             //Game lost
             Debug.Log("Oh no, you lost!");
+            
+            lossScreen.SetActive(true);
         }
     }
 
@@ -245,5 +255,11 @@ public class GameMaster : MonoBehaviour
         nr = (int)(pos.x * gridWidth + pos.y);
 
         return tiles[nr];
+    }
+
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(0);
     }
 }
