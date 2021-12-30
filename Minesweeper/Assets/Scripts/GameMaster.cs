@@ -5,18 +5,37 @@ using UnityEngine.UI;
 
 public class GameMaster : MonoBehaviour
 {
+
+    [Header("Settings")]
     public int minGridDiameter;
     public int maxGridDiameter;
 
+    [Header("Variables")]
     public int minecount;
     public int gridWidth;
     public int gridHeigth;
 
-    public Vector2[] mines;
+    public int clickcount;
+
+    public bool gameRunning;
+
+    public float timer;
 
 
     public Vector2 offset;
 
+    public List<Tile> tiles = new List<Tile>();
+
+    [Header("Displays")]
+    public Text ccDisplay;
+    public Text timeDisplay;
+
+    public Vector2[] mines;
+
+    public Sprite mineSprite;
+    public Sprite[] numberSprites;
+
+    [Header("References")]
     public GameObject gridGO;
     public GameObject gridBG;
     public Transform tileParent;
@@ -69,12 +88,28 @@ public class GameMaster : MonoBehaviour
 
         SetMines();
         CreateGrid();
+
+        gameRunning = true;
     }
 
     void Start()
     {
         userInput.SetActive(true);
         gridGO.SetActive(false);
+
+        gameRunning = false;
+    }
+
+    void Update()
+    {
+        if(gameRunning)
+        {
+            timer += Time.deltaTime;
+
+            float minutes = Mathf.FloorToInt(timer / 60);
+            float seconds = Mathf.FloorToInt(timer % 60);
+            timeDisplay.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        }
     }
 
     public void CreateGrid()
@@ -106,9 +141,9 @@ public class GameMaster : MonoBehaviour
             for (int j = 0; j < gridHeigth; j++)
             {
                 Vector2 pos = new Vector2(i, j) + offset;
-                Tile tile = Instantiate(tilePrefab, pos, Quaternion.identity, tileParent).GetComponent<Tile>();
-                tile.pos = new Vector2(i, j);
-                //tile.proxMinecount = CalculateProxMines(new Vector2(i, j));
+                Tile _tile = Instantiate(tilePrefab, pos, Quaternion.identity, tileParent).GetComponent<Tile>();
+                tiles.Add(_tile);
+                _tile.pos = new Vector2(i, j);
             }
         }
     }
@@ -138,48 +173,33 @@ public class GameMaster : MonoBehaviour
 
             //Debug.Log("Mine Nr." + (i+1) + " at " + mines[i].x + ", " + mines[i].y);
 
-            Vector2 pos = new Vector2(mines[i].x + offset.x, mines[i].y + offset.y);
-            Instantiate(minePrefab, pos, Quaternion.identity, mineParent);
+            //Vector2 pos = new Vector2(mines[i].x + offset.x, mines[i].y + offset.y);
+            //Instantiate(minePrefab, pos, Quaternion.identity, mineParent);
         }
     }
 
-    public void OpenTile(Vector2 position)
+    public bool CheckForMine(Vector2 position)
     {
         for(int i = 0; i < minecount; i++)
         {
             if(mines[i] == position)
             {
-                ClearedTile(true);
-                return;
+                //Debug.Log("You hit a mine.");
+                return true;
             }
         }
 
-        ClearedTile(false);
-    }
-
-    public void ClearedTile(bool mine)
-    {
-        if (mine)
-        {
-            //Game Over
-            
-        }
-        else
-        {
-            //Show Tile Number
-
-        }
+        return false;
     }
 
     public int CalculateProxMines(Vector2 pos)
     {
         int count = 0;
 
-
         for(int i = 0; i < minecount; i++)
         {
             Vector2 relative = pos - mines[i];
-            Debug.Log("relative position to Mine " + i + " is " + relative);
+            //Debug.Log("relative position to Mine " + i + " is " + relative);
 
             if(relative.x < 2 && relative.y < 2 && relative.x > -2 && relative.y > -2)
             {
@@ -188,5 +208,42 @@ public class GameMaster : MonoBehaviour
         }
 
         return count;
+    }
+
+    public void AddClickCount()
+    {
+        clickcount++;
+
+        ccDisplay.text = "Count: " + clickcount;
+
+        if(clickcount == (gridHeigth * gridWidth) - minecount)
+        {
+            GameOver(true);
+        }
+    }
+
+    public void GameOver(bool win)
+    {
+        gameRunning = false;
+
+        if(win)
+        {
+            //Game won
+            Debug.Log("Hey, you won the game!");
+        }
+        else
+        {
+            //Game lost
+            Debug.Log("Oh no, you lost!");
+        }
+    }
+
+    public Tile SearchTile(Vector2 pos)
+    {
+        int nr = 0;
+
+        nr = (int)(pos.x * gridWidth + pos.y);
+
+        return tiles[nr];
     }
 }
