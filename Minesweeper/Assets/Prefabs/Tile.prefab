@@ -131,8 +131,10 @@ MonoBehaviour:
   state: 0
   pos: {x: 0, y: 0}
   proxMinecount: 0
-  closedColor: {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 1}
-  openColor: {r: 0.33, g: 0.33, b: 0.33, a: 1}
+  closedColor: {r: 0.7028302, g: 0.7461675, b: 1, a: 1}
+  zeroColor: {r: 0.15566039, g: 0.29937774, b: 1, a: 1}
+  oneColor: {r: 0.21226418, g: 0.3461027, b: 1, a: 1}
+  colorDiff: {r: 0.0754717, g: 0.0623989, b: 0, a: 0}
   numberGO: {fileID: 2518532754074203063}
   bgGO: {fileID: 8903341653513583040}
   gm: {fileID: 0}
@@ -234,7 +236,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: aca8a45e0c607d244a4c846a96cd3a3a, type: 3}
-  m_Color: {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 1}
+  m_Color: {r: 0.7688679, g: 0.8073899, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

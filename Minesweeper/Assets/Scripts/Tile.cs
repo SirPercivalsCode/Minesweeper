@@ -11,10 +11,14 @@ public class Tile : MonoBehaviour
     public Vector2 pos;
     public int proxMinecount;
 
+    private bool flagged;
 
+    public Color closedColor = new Color (0.7028302f, 0.7461675f, 1f, 1);
 
-    public Color closedColor = new Color (0.5283019f, 0.5283019f, 0.5283019f, 1);
-    public Color openColor = new Color (0.45f, 0.45f, 0.45f, 1);
+    public Color zeroColor = new Color (0.1556604f, 0.2993777f, 1f, 1);
+    public Color oneColor = new Color (0.1933962f, 0.3306904f, 1f, 1);
+    public Color colorDiff = new Color (0.0754717f, 0.0623989f, 0f, 0);
+    
 
     public GameObject numberGO;
     public GameObject bgGO;
@@ -26,6 +30,30 @@ public class Tile : MonoBehaviour
         numberGO.SetActive(false);
         gm = GameObject.Find("GameMaster").GetComponent<GameMaster>();
         bgGO.GetComponent<SpriteRenderer>().color = closedColor;
+    }
+
+    public void OnMouseOver()
+    {
+        if(!gm.gameRunning || state == states.Opened)
+        {
+            return;
+        }
+
+        if(Input.GetMouseButtonDown(1))
+        {
+            if(flagged)
+            {
+                flagged = false;
+                numberGO.SetActive(false);
+            }
+            else
+            {
+                flagged = true;
+                gm.AddFlagCount();
+                numberGO.SetActive(true);
+                numberGO.GetComponent<SpriteRenderer>().sprite = gm.flagSprite;
+            }
+        }
     }
 
     public void OnMouseUp()
@@ -46,21 +74,31 @@ public class Tile : MonoBehaviour
             state = states.Opened;
             gm.AddClickCount();
 
-            numberGO.SetActive(true);
+            
 
             bool lost = gm.CheckForMine(pos);
             if(lost)
             {
+                numberGO.SetActive(true);
                 numberGO.GetComponent<SpriteRenderer>().sprite = gm.mineSprite;
             }
             else
             {
                 proxMinecount = gm.CalculateProxMines(pos);
-                numberGO.GetComponent<SpriteRenderer>().sprite = gm.numberSprites[proxMinecount];
+                if(proxMinecount == 0)
+                {
+                    bgGO.GetComponent<SpriteRenderer>().color = zeroColor;
+                }
+                else
+                {
+                    numberGO.SetActive(true);
+                    numberGO.GetComponent<SpriteRenderer>().sprite = gm.numberSprites[proxMinecount];
+                    bgGO.GetComponent<SpriteRenderer>().color = oneColor + (colorDiff * proxMinecount);
+                }
             }
 
             //Change Color
-            bgGO.GetComponent<SpriteRenderer>().color = openColor;
+            //bgGO.GetComponent<SpriteRenderer>().color = openColor;
             
             if(lost)
             {

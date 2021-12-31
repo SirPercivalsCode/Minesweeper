@@ -18,10 +18,12 @@ public class GameMaster : MonoBehaviour
     public int gridHeigth;
 
     public int clickcount;
+    public int flagcount;
 
     public bool gameRunning;
 
     public float timer;
+    private string time;
 
 
     public Vector2 offset;
@@ -31,15 +33,21 @@ public class GameMaster : MonoBehaviour
     [Header("Displays")]
     public Text ccDisplay;
     public Text timeDisplay;
+    public Text flagDisplay;
+    public Text minecountDisplay;
+    public Text endTimeDisplay;
+    public Text endMinecountDisplay;
 
     public Vector2[] mines;
 
     public Sprite mineSprite;
+    public Sprite flagSprite;
     public Sprite[] numberSprites;
 
     [Header("References")]
     public GameObject winScreen;
-    public GameObject lossScreen; 
+    public GameObject lossScreen;
+    public GameObject statdisplayGO;
     public GameObject gridGO;
     public GameObject gridBG;
     public Transform tileParent;
@@ -50,8 +58,20 @@ public class GameMaster : MonoBehaviour
     public GameObject userInput;
     public Text inputCount, inputWidth, inputHeight;
 
+    public enum Scenes
+    {
+        MainMenu = 0,
+        CustomGame = 1
+    }
+
+    public Scenes currentScene;
+
+    // * Only call from Custom Game
     public void SetGrid()
     {
+        currentScene = Scenes.CustomGame;
+        statdisplayGO.SetActive(true);
+
         int.TryParse(inputCount.text, out minecount);
         int.TryParse(inputWidth.text, out gridWidth);
         int.TryParse(inputHeight.text, out gridHeigth);
@@ -89,6 +109,7 @@ public class GameMaster : MonoBehaviour
         {
             minecount = (int)gridHeigth * gridWidth / 5;
         }
+        minecountDisplay.text = "Mines: " + minecount.ToString();
 
         SetMines();
         CreateGrid();
@@ -102,6 +123,7 @@ public class GameMaster : MonoBehaviour
         gridGO.SetActive(false);
         winScreen.SetActive(false);
         lossScreen.SetActive(false);
+        statdisplayGO.SetActive(false);
 
         gameRunning = false;
     }
@@ -114,7 +136,8 @@ public class GameMaster : MonoBehaviour
 
             float minutes = Mathf.FloorToInt(timer / 60);
             float seconds = Mathf.FloorToInt(timer % 60);
-            timeDisplay.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+            time = string.Format("{0:00}:{1:00}", minutes, seconds);
+            timeDisplay.text = time;
         }
     }
 
@@ -228,22 +251,29 @@ public class GameMaster : MonoBehaviour
         }
     }
 
+    public void AddFlagCount()
+    {
+        flagcount++;
+        flagDisplay.text = "Flags: " + flagcount.ToString();
+    }
+
     public void GameOver(bool win)
     {
         gameRunning = false;
 
+        endTimeDisplay.text = "Time: " + time;
+        endMinecountDisplay.text = "Minecount: " + minecount;
+
+        statdisplayGO.SetActive(false);
+
         if(win)
         {
             //Game won
-            Debug.Log("Hey, you won the game!");
-
             winScreen.SetActive(true);
         }
         else
         {
             //Game lost
-            Debug.Log("Oh no, you lost!");
-            
             lossScreen.SetActive(true);
         }
     }
@@ -252,7 +282,7 @@ public class GameMaster : MonoBehaviour
     {
         int nr = 0;
 
-        nr = (int)(pos.x * gridWidth + pos.y);
+        nr = (int)(pos.x * gridHeigth + pos.y);
 
         return tiles[nr];
     }
@@ -260,6 +290,21 @@ public class GameMaster : MonoBehaviour
 
     public void RestartGame()
     {
-        SceneManager.LoadScene(0);
+        int scenenr = GetSceneNr(currentScene);
+
+        Debug.ClearDeveloperConsole();
+        SceneManager.LoadScene(scenenr);
+    }
+
+    public int GetSceneNr(Scenes scene)
+    {
+        int scenenr = (int)scene;
+        return scenenr;
+    }
+
+    public void BackToMainMenu()
+    {
+        int scenenr = GetSceneNr(Scenes.MainMenu);
+        SceneManager.LoadScene(scenenr);
     }
 }
