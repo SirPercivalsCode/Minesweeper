@@ -239,21 +239,29 @@ public class GameMaster : MonoBehaviour
         return count;
     }
 
-    public void AddClickCount()
+    public void AddClickCount(bool lost)
     {
         clickcount++;
 
         ccDisplay.text = "Count: " + clickcount;
 
-        if(clickcount == (gridHeigth * gridWidth) - minecount)
+        
+        if(clickcount == (gridHeigth * gridWidth) - minecount && lost == false)
         {
             GameOver(true);
         }
     }
 
-    public void AddFlagCount()
+    public void AddFlagCount(bool positive)
     {
-        flagcount++;
+        if(positive)
+        {
+            flagcount++;
+        }
+        else
+        {
+            flagcount--;
+        }
         flagDisplay.text = "Flags: " + flagcount.ToString();
     }
 

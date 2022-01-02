@@ -44,12 +44,13 @@ public class Tile : MonoBehaviour
             if(flagged)
             {
                 flagged = false;
+                gm.AddFlagCount(false);
                 numberGO.SetActive(false);
             }
             else
             {
                 flagged = true;
-                gm.AddFlagCount();
+                gm.AddFlagCount(true);
                 numberGO.SetActive(true);
                 numberGO.GetComponent<SpriteRenderer>().sprite = gm.flagSprite;
             }
@@ -72,11 +73,12 @@ public class Tile : MonoBehaviour
         {
             //Debug.Log("Tile Nr. " + pos.x + "|" + pos.y + " opened.");
             state = states.Opened;
-            gm.AddClickCount();
 
             
 
             bool lost = gm.CheckForMine(pos);
+            gm.AddClickCount(lost);
+
             if(lost)
             {
                 numberGO.SetActive(true);
