@@ -34,6 +34,7 @@ public class Tile : MonoBehaviour
 
     public void OnMouseOver()
     {
+        /*
         if(!gm.gameRunning || state == states.Opened)
         {
             return;
@@ -55,11 +56,36 @@ public class Tile : MonoBehaviour
                 numberGO.GetComponent<SpriteRenderer>().sprite = gm.flagSprite;
             }
         }
+        */
     }
 
     public void OnMouseUp()
     {
-        OpenTile();
+        if(gm.flagSelected)
+        {
+            if(state == states.Opened)
+            {
+                return;
+            }
+
+            if(flagged)
+            {
+                flagged = false;
+                gm.AddFlagCount(false);
+                numberGO.SetActive(false);
+            }
+            else
+            {
+                flagged = true;
+                gm.AddFlagCount(true);
+                numberGO.SetActive(true);
+                numberGO.GetComponent<SpriteRenderer>().sprite = gm.flagSprite;
+            }
+        }
+        else
+        {
+            OpenTile();
+        }
     }
 
     public void OpenTile()
@@ -69,6 +95,13 @@ public class Tile : MonoBehaviour
             return;
         }
 
+        if(flagged)
+        {
+            flagged = false;
+            gm.AddFlagCount(false);
+            numberGO.SetActive(false);
+        }
+        
         if(state == states.Closed)
         {
             //Debug.Log("Tile Nr. " + pos.x + "|" + pos.y + " opened.");

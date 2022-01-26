@@ -19,6 +19,7 @@ public class GameMaster : MonoBehaviour
 
     public int clickcount;
     public int flagcount;
+    public bool flagSelected;
 
     public bool gameRunning;
 
@@ -38,6 +39,12 @@ public class GameMaster : MonoBehaviour
     public Text endTimeDisplay;
     public Text endMinecountDisplay;
 
+    public Text selectedToolDisplay;
+    public string notSelectedFlagText;
+    public string selectedFlagText;
+    public Color discoverColor = new Color (0.716925f, 0.3056604f, 1f, 1);
+    public Color flagColor = new Color (1f, 0.6776355f, 0.3058823f, 1);
+
     public Vector2[] mines;
 
     public Sprite mineSprite;
@@ -48,6 +55,7 @@ public class GameMaster : MonoBehaviour
     public GameObject winScreen;
     public GameObject lossScreen;
     public GameObject statdisplayGO;
+    public GameObject toolUI;
     public GameObject gridGO;
     public GameObject gridBG;
     public Transform tileParent;
@@ -71,6 +79,7 @@ public class GameMaster : MonoBehaviour
     {
         currentScene = Scenes.CustomGame;
         statdisplayGO.SetActive(true);
+        toolUI.SetActive(true);
 
         int.TryParse(inputCount.text, out minecount);
         int.TryParse(inputWidth.text, out gridWidth);
@@ -80,34 +89,41 @@ public class GameMaster : MonoBehaviour
         if (gridHeigth > maxGridDiameter)
         {
             gridHeigth = maxGridDiameter;
+            Debug.Log("Grid's size has been adjusted to fit.");
         }
         else if(gridHeigth < minGridDiameter)
         {
             gridHeigth = minGridDiameter;
+            Debug.Log("Grid's size has been adjusted to fit.");
         }
 
 
         if (gridWidth > maxGridDiameter)
         {
             gridWidth = maxGridDiameter;
+            Debug.Log("Grid's size has been adjusted to fit.");
         }
         else if (gridWidth < minGridDiameter)
         {
             gridWidth = minGridDiameter;
+            Debug.Log("Grid's size has been adjusted to fit.");
         }
 
 
         if (minecount < 1)
         {
             minecount = 1;
+            Debug.Log("Minecount has been raised to 1, as this is the minimum amount.");
         }
         else if (minecount < gridHeigth * gridWidth / 20)
         {
             minecount = (int)gridHeigth * gridWidth / 20;
+            Debug.Log("Minecount has been raised to 5%, as this is the minimum amount.");
         }
         else if (minecount > gridHeigth * gridWidth / 5)
         {
             minecount = (int)gridHeigth * gridWidth / 5;
+            Debug.Log("Minecount has been lowered to 20%, as this is the maximum  amount.");
         }
         minecountDisplay.text = "Mines: " + minecount.ToString();
 
@@ -124,6 +140,7 @@ public class GameMaster : MonoBehaviour
         winScreen.SetActive(false);
         lossScreen.SetActive(false);
         statdisplayGO.SetActive(false);
+        toolUI.SetActive(false);
 
         gameRunning = false;
     }
@@ -138,6 +155,54 @@ public class GameMaster : MonoBehaviour
             float seconds = Mathf.FloorToInt(timer % 60);
             time = string.Format("{0:00}:{1:00}", minutes, seconds);
             timeDisplay.text = time;
+            
+            if(Input.GetKeyDown("1"))
+            {
+                SwitchFlagSelected(false);
+            }
+            if(Input.GetKeyDown("2"))
+            {
+                SwitchFlagSelected(true);
+            }
+            if(Input.GetKeyDown("q"))
+            {
+                SwitchFlagSelected(false, true);
+            }
+        }
+    }
+
+    public void SwitchFlagSelected(bool _flagSelected = true, bool justSwitch = false)
+    {
+        if(justSwitch)
+        {
+            if(flagSelected)
+            {
+                flagSelected = false;
+            }
+            else 
+            {
+                flagSelected = true;
+            }
+        }
+        else if(_flagSelected)
+        {
+            flagSelected = false;
+        }
+        else if(_flagSelected == false)
+        {
+            flagSelected = true;
+        }
+
+        //Adjust UI
+        if(flagSelected)
+        {
+            selectedToolDisplay.text = selectedFlagText;
+            selectedToolDisplay.color = flagColor;
+        }
+        else
+        {
+            selectedToolDisplay.text = notSelectedFlagText;
+            selectedToolDisplay.color = discoverColor;
         }
     }
 
