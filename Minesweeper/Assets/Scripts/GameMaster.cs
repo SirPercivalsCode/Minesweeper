@@ -26,8 +26,9 @@ public class GameMaster : MonoBehaviour
     public float timer;
     private string time;
 
-
     public Vector2 offset;
+
+    public float vcamConfinerOffset;
 
     public List<Tile> tiles = new List<Tile>();
 
@@ -62,6 +63,8 @@ public class GameMaster : MonoBehaviour
     public GameObject tilePrefab;
     public Transform mineParent;
     public GameObject minePrefab;
+
+    public PolygonCollider2D polCol;
 
     public GameObject userInput;
     public Text inputCount, inputWidth, inputHeight;
@@ -227,6 +230,23 @@ public class GameMaster : MonoBehaviour
         gridGO.transform.position = gridGO.transform.position + new Vector3(offset.x, offset.y, 0f);
         gridBG.transform.position = gridGO.transform.position - new Vector3(offset.x, offset.y, 0f);
         gridBG.transform.localScale = new Vector3(gridWidth * 1.05f, gridHeigth * 1.05f, 1);
+
+
+        polCol.enabled = false;
+        polCol.pathCount = 1;
+        Vector2[] pathpoints = new Vector2[4];
+
+        float offsetx = gridWidth/2 + vcamConfinerOffset;
+        float offsety = gridHeigth/2 + vcamConfinerOffset;
+
+        pathpoints[0] = new Vector2(-offsetx,-offsety);
+        pathpoints[1] = new Vector2(offsetx, -offsety);
+        pathpoints[2] = new Vector2(offsetx, offsety);
+        pathpoints[3] = new Vector2(-offsetx, offsety);
+
+
+        polCol.SetPath(0, pathpoints);
+        polCol.enabled = true;
 
 
         //Calculate Position
